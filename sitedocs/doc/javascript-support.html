@@ -1,0 +1,269 @@
+<html>
+<head><title>JavaScript Support</title></head>
+<body>
+<p>
+JavaScript support is very basic at present. The near-term goal is full JavaScript 1.1 support. Currently, we do not plan
+to support browser-specific JavaScript. Please let us know via the mailing list your priorities for missing features.
+Inline and included scripts are supported, as are the following DOM elements:
+
+<h2>Window</h2>
+<h4>properties</h4>
+<ul>
+<li>closed    - true if the window has been closed</li>
+<li>document  - the associated Document object</li>
+<li>frames    - an array of subframes of this window</li>
+<li>location  - r/w the associated Location object, which may be treated as a URL string</li>
+<li>name      - r/w the name of the window</li>
+<li>navigator - the Navigator object</li>
+<li>opener    - r/o the window which opened this one (top-level frames only)</li>
+<li>parent    - the window which is a parent of this one.
+<li>self      - the Window itself</li>
+<li>top       - the top frame in the frameset containing this window
+<li>window    - a synonym for self</li>
+<li>&lt;name&gt;    - the subframe of this window with the specified name
+</ul>
+<h4>events</h4>
+<ul>
+<li>onLoad - invoked when the page is loaded</li>
+</ul>
+<h4>methods</h4>
+<ul>
+<li>alert()   - queues up an alert message, accessible via WebClient.getNextAlert() or popNextAlert()</li>
+<li>close()   - closes the window</li>
+<li>confirm() - invokes a callback supplied via WebClient.setDialogResponder to return the user's response. By default,
+                the callback returns true. Users may change this by supplying an implementation of DialogResponder.</li>
+<li>prompt()  - invokes a callback supplied via WebClient.setDialogResponder to return the user's response</li>
+<li>open()    - opens a new window. A callback will be generated to any WebWindowListener registered with the client.</li>
+</ul>
+
+<h2>Navigator</h2>
+<h4>properties</h4>
+<ul>
+<li>appCodeName - the code name set in ClientProperties.setApplicationCodeName()</li>
+<li>appName     - the name of the browser, as set in ClientProperties.setApplicationName()</li>
+<li>appVersion  - the browser version, set in ClientProperties.setApplicationVersion()</li>
+<li>plugins     - an empty array of objects, since plugins are not universally supported</li>
+<li>platform    - the platform for the browser, set in ClientProperties.setPlatform (1.2 feature)</li>
+<li>userAgent   - the name of the user agent, set by ClientProperties.setUserAgent or derived from the code name and version</li>
+</ul>
+<h4>methods</h4>
+<ul>
+<li>javaEnabled - always returns false to indicate that applets are not supported</li>
+</ul>
+
+<h2>Screen (1.2 feature)</h2>
+<h4>properties</h4>
+<ul>
+<li>availWidth  - the available screen width, set in ClientProperties.setAvailableScreenWidth()</li>
+<li>availHeight - the available screen height, set in ClientProperties.setAvailableScreenHeight()</li>
+</ul>
+<h4>methods</h4>
+<ul>
+<li>javaEnabled - always returns false to indicate that applets are not supported</li>
+</ul>
+
+<h2>Location</h2>
+<h4>properties</h4>
+<ul>
+<li>href      - r/w the current window location. Setting this value initiates a new request to the server</li>
+<li>host      - r/o the host and port portion of the current window location</li>
+<li>hostname  - r/o the host portion of the current window location</li>
+<li>port      - r/o the port portion of the current window location</li>
+<li>protocol  - r/o the port portion of the current window location</li>
+<li>pathname  - r/w the path portion of the current window location. Setting this value initiates a new request to the server</li>
+<li>search    - r/w the query portion of the current window location. Setting this value initiates a new request to the server</li>
+</ul>
+<h4>methods</h4>
+<ul>
+<li>replace - replaces the current window by doing a new request to the server</li>
+</ul>
+
+<h2>Document</h2>
+<h4>properties</h4>
+<ul>
+<li>forms - an array of Form objects</li>
+<li>images - an array of Image objects</li>
+<li>links - an array of Link objects</li>
+<li>title - readonly. The title of the page</li>
+<li>location - a synonym for window.location</li>
+<li>cookie - access to the document-specific cookies.</li>
+<li>&lt;name&gt; - the name of a form, image, or link</li>
+</ul>
+<h4>methods</h4>
+<ul>
+<li>open  - opens a document for writing, optionally specifying a MIME type</li>
+<li>close - closes the open document and replaces its contents with the written text</li>
+<li>getElementById - returns the element in the document with the specified ID</li>
+<li>getElementsByName - returns an array of all elements in the document with the specified name</li>
+<li>getElementsByTagName - returns an array of all elements in the document with the specified tag name</li>
+<li>write - writes a string to the contents of the current open document</li>
+<li>writeln - writes a line with carriage-return to the contents of the current open document</li>
+</ul>
+
+<h2>HTMLElement</h2>
+<h4>properties</h4>
+<ul>
+<li>title    - r/o the title attribute of the element</li>
+<li>style    - r/o the style attribute</li>
+<li>tagName  - r/o the tag associated with the element</li>
+<li>nodeName - r/o the tag associated with the element (same as tagName)</li>
+</ul>
+
+<h2>Style</h2>
+<h4>properties</h4>
+<ul>
+<li>display    - r/w browser-specific display control</li>
+<li>visibility - r/w browser-specific visibility control</li>
+</ul>
+
+<h2>Form (inherits from HTMLElement)</h2>
+<h4>properties</h4>
+<ul>
+<li>action   - r/w the action associated with the form</li>
+<li>document - r/o the enclosing document</li>
+<li>elements - r/o an array of controls in the form</li>
+<li>action   - r/w the target for any response from the form</li>
+<li>length   - r/o the number of controls in the form</li>
+<li>&lt;name&gt; - the name of a control in the form</li>
+</ul>
+<h4>events</h4>
+<ul>
+<li>onReset  - invoked when form.reset() is invoked or a reset button is clicked</li>
+<li>onSubmit - invoked when form.submit() is invoked or a submit button is clicked</li>
+</ul>
+<h4>methods</h4>
+<ul>
+<li>submit - submits the form</li>
+<li>reset  - resets the form controls to their default values</li>
+<li>getElementsByTagName - returns an array of all elements in the form with the specified tag name</li>
+</ul>
+
+<h2>Image</h2>
+<h4>properties</h4>
+<ul>
+<li>src - read/write - the relative URL of the image</li>
+<li>name - read-only - the name attribute of the image</li>
+</ul>
+
+<h2>Link (inherits from HTMLElement)</h2>
+<h4>properties</h4>
+<ul>
+<li>href - read/write - the URL associated with the link</li>
+</ul>
+<h4>events</h4>
+<ul>
+<li>onClick - invoked when link.click() is invoked</li>
+<li>onMouseOver - invoked when link.mouseOver() is invoked<li>
+</ul>
+
+<h2>Input (inherits from HTMLElement)</h2>
+<h4>properties</h4>
+<ul>
+<li>form     - read-only - the form containing the input</li>
+<li>name     - read-only - the name of the control</li>
+<li>tabindex - read-only - the index of the control for tabbing
+<li>type     - read-only - the name of the type of control</li>
+<li>defaultValue - read-only - the value predefined for the control (text only)</li>
+</ul>
+<h4>methods</h4>
+<ul>
+<li>focus() - a no-op</li>
+</ul>
+
+<h2>Button (inherits from Input)</h2>
+<h4>events</h4>
+<ul>
+<li>onClick - invoked when button.click() is called</li>
+</ul>
+
+<h2>Text (inherits from Input)</h2>
+<h4>properties</h4>
+<ul>
+<li>value     - read/write - the current text value</li>
+<li>maxlength - read-only  - the maximum number of characters which may be entered
+</ul>
+<h4>events</h4>
+<ul>
+<li>onChange - invoked when the value of the control is changed via form.setParameter</li>
+</ul>
+
+<h2>TextArea (inherits from Input)</h2>
+<h4>properties</h4>
+<ul>
+<li>value    - read/write - the current text value</li>
+</ul>
+<h4>events</h4>
+<ul>
+<li>onChange - invoked when the value of the control is changed via form.setParameter</li>
+</ul>
+
+<h2>Hidden (inherits from Input)</h2>
+<h4>properties</h4>
+<ul>
+<li>value - read/write - the current text value</li>
+</ul>
+
+<h2>Password (inherits from Input)</h2>
+<h4>properties</h4>
+<ul>
+<li>value    - read/write - the current text value</li>
+</ul>
+<h4>events</h4>
+<ul>
+<li>onChange - invoked when the value of the control is changed via form.setParameter</li>
+</ul>
+
+<h2>Checkbox (inherits from Input)</h2>
+<h4>properties</h4>
+<ul>
+<li>checked        - read/write - the state of the checkbox</li>
+<li>defaultChecked - read-only  - the default state of the checkbox</li>
+<li>value          - read/write - the value transmitted if the control is checked</li>
+</ul>
+<h4>events</h4>
+<ul>
+<li>onClick - invoked when the state of the control is changed via form.setParameter or form.removeParameter</li>
+</ul>
+
+<h2>Radio (inherits from Input)</h2>
+<h4>properties</h4>
+<ul>
+<li>checked        - read/write - the state of the radio button</li>
+<li>defaultChecked - read-only  - the default state of the radio button</li>
+<li>value          - read/write - the value transmitted if the control is checked</li>
+</ul>
+<h4>events</h4>
+<ul>
+<li>onClick - invoked when the state of the control is changed via form.setParameter</li>
+</ul>
+
+<h2>Select (inherits from Input)</h2>
+<h4>properties</h4>
+<ul>
+<li>length         - read-only - the number of options associated with the control</li>
+<li>selectedIndex  - read-write - the index of the selected option</li>
+<li>options        - read-write - an array of the options associated with the control</li>
+<li>options.length - read-write - the number of options associated with the control</li>
+<li>value          - read-write - the value of the selected option</li>
+</ul>
+<h4>events</h4>
+<ul>
+<li>onChange       - invoked when the value of the control is changed via form.setParameter</li>
+</ul>
+
+<h2>Option (inherits from Input)</h2>
+<h4>constructor</h4>
+You may construct an Option object and assign it to an element in the Select.options array
+<h4>properties</h4>
+<ul>
+<li>text     - read-write - the display text associated with the option (listed after the &lt'option&gt; tag)</li>
+<li>value    - read-write - the value associated with the option (from the 'value' attribute)</li>
+<li>selected - read-write - true if this option is currently selected</li>
+<li>defaultSelected - read-only - true if this option is selected by default</li>
+<li>index    - read-only - the index of this option in its select</li>
+</ul>
+
+</body>
+</html>
+
+

@@ -1,0 +1,31 @@
+<html>
+<body>
+<p>Automated testing is a great way to ensure that code being maintained works.
+The <A HREF="http://www.XProgramming.com/">Extreme Programming</A> (XP) methodology relies heavily on it,
+and practitioners have available to them a range of
+<A HREF="http://www.xprogramming.com/software.htm">testing frameworks</A>,
+most of which work by making direct calls to the code being tested.
+But what if you want to test a web application?
+Or what if you simply want to use a web-site as part of a distributed application?</p>
+
+<p>In either case, you need to be able to bypass the browser and access your site from a program.
+HttpUnit makes this easy. Written in Java,
+HttpUnit emulates the relevant portions of browser behavior, including
+form submission, <a href="doc/javascript-support.html">JavaScript</a>,
+basic <A HREF="ftp://ftp.isi.edu/in-notes/rfc2617.txt">http authentication</A>,
+cookies and automatic page redirection, and allows
+Java test code to examine returned pages either as text, an XML DOM, or containers of forms, tables, and links. When
+combined with a framework such as <A HREF="http://www.junit.org">JUnit</a>, it is fairly easy to write tests that very
+quickly verify the functioning of a web site.</p>
+
+<p>The same techniques used to test web sites can be used to test and develop servlets without a servlet container
+using <A HREF="doc/servletunit-intro.html">ServletUnit</A>, included in the download.</p>
+
+<h2>Documentation</h2>
+Several working example files come with the distribution download.
+A rudimentary <A HREF="doc/cookbook.html">Cookbook</A> is available, as are
+a <a href="doc/tutorial/index.html">tutorial</a>, a <A HREF="doc/faq.html">FAQ</A> and
+the <A HREF="doc/api/index.html">javadoc</A>.
+Work has also begun on a <a href="doc/manual/index.html">User's Manual</a>
+</body>
+</html>

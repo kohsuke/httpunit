@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="src" path="pending-tests"/>
+	<classpathentry kind="src" path="examples"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="jars/activation.jar"/>
+	<classpathentry kind="lib" path="jars/ant-dependencies.jar"/>
+	<classpathentry kind="lib" path="jars/mailapi.jar"/>
+	<classpathentry kind="lib" path="jars/quicksite.jar"/>
+<!-- you might want to create a class path variable MAVEN_REPOSITORY 
+  that points to
+  e.g. C:/Dokumente und Einstellungen/<your username>/.maven/repository
+-->  	
+	<classpathentry kind="var" path="MAVEN_REPOSITORY/jtidy/jars/jtidy-4aug2000r7_dev.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPOSITORY/junit/jars/junit-3.8.1.jar"/>
+<!-- you might want to decide which nekohtml to use	
+	<classpathentry kind="var" path="MAVEN_REPOSITORY/nekohtml/jars/nekohtml-1.9.6.jar"/>
+-->	
+	<classpathentry kind="var" path="MAVEN_REPOSITORY/nekohtml/jars/nekohtml-0.9.5.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPOSITORY/rhino/jars/js-1.6R5.jar" sourcepath="/pub/2008/rhino1_6R5.zip"/>
+	<classpathentry kind="var" path="MAVEN_REPOSITORY/servletapi/jars/servletapi-2.4.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPOSITORY/xerces/jars/xercesImpl-2.6.1.jar" sourcepath="/pub/2008/Xerces-J-src.2.6.1.zip"/>
+	<classpathentry kind="var" path="MAVEN_REPOSITORY/xerces/jars/xmlParserAPIs-2.6.1.jar"/>
+<!--
+  this is how you could debug with a local Xerces	
+	<classpathentry kind="lib" path="F:/pub/2008/Xerces-J-src.2.6.1.zip" sourcepath="F:/pub/2008/Xerces-J-src.2.6.1.zip"/>
+-->	
+	<classpathentry kind="lib" path="META-INF"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

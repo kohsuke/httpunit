@@ -1,0 +1,393 @@
+<?xml version="1.0" ?>
+<!-- ****************************************************************************************************************
+*
+* $Id: build.xml 984 2008-05-20 20:26:21Z russgold $
+*
+* http://httpunit.org/
+* Copyright (c) 2002-2008 Russell Gold
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+* the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+* to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
+* of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+* THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+* CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+* DEALINGS IN THE SOFTWARE.
+*
+**************************************************************************************************************** -->
+
+<!--  ======================================================================= -->
+<!--  httpunit build file                                                     -->
+<!--  ======================================================================= -->
+<project name="httpunit" default="jar" basedir="." xmlns:artifact="urn:maven-artifact-ant">
+    <property name="name" value="httpunit" />
+    <property name="Name" value="HttpUnit" />
+    <property name="version" value="1.7" />
+    <property name="revision" value="$Rev: 984 $" />
+
+    <property name="debug" value="on" />
+    <property name="deprecation" value="off" />
+    <property name="optimize" value="off" />
+
+    <property name="src.dir" value="src" />
+    <property name="tstsrc.dir" value="test" />
+    <property name="examples.dir" value="examples" />
+    <property name="website.dir" value="site" />
+    <property name="quicksite.dir" value="../quicksite/src" />
+    <property name="lib.dir" value="lib" />
+    <property name="jars.dir" value="jars" />
+
+    <property name="docs.dir" value="doc" />
+    <property name="build.dir" value="build" />
+    <property name="build.classes" value="${build.dir}/classes" />
+    <property name="test.classes" value="${build.dir}/testclasses" />
+    <property name="website.classes" value="${build.dir}/siteclasses" />
+    <property name="example.classes" value="${build.dir}/examples" />
+    <property name="javadoc.dir" value="${docs.dir}/api" />
+
+    <property name="dist.dir" value="dist" />
+    <property name="archive.dir" value="${dist.dir}/${name}-${version}" />
+    <property name="classpath" value="" />
+    <property name="web.dir" value="web" />
+    <property name="packages" value="com.meterware.httpunit,com.meterware.servletunit,com.meterware.pseudoserver,com.meterware.httpunit.cookies,com.meterware.httpunit.scripting,com.meterware.httpunit.parsing" />
+    <property name="test.class" value="com.meterware.httpunit.HttpUnitSuite" />
+    <property name="servlet.test.class" value="com.meterware.servletunit.ServletUnitSuite" />
+
+<!--  ===================================================================  -->
+<!--  Prepares the build directory                                         -->
+<!--  ===================================================================  -->
+
+    <target name="check_jars_dir">
+        <path id="check.path">
+            <fileset dir="${jars.dir}"/>
+        </path>
+        <condition property="have.local.jars">
+            <or>
+                <available classname="org.cyberneko.html.HTMLConfiguration" classpathref="check.path"/>
+                <available classname="org.w3c.tidy.Tidy"                    classpathref="check.path"/>
+            </or>
+        </condition>
+    </target>
+
+    <target name="prepare_local_classpath" depends="check_jars_dir" if="have.local.jars">
+        <echo message="using local classpath"/>
+        <path id="base.classpath">
+            <fileset id="distributed.jars" dir="${jars.dir}"/>
+        </path>
+    </target>
+
+		<!-- use maven ant-task to optionally download missing parts from maven repository -->
+    <target name="prepare_repository_classpath" depends="check_jars_dir" unless="have.local.jars">
+        <echo message="using repository classpath"/>
+
+        <typedef classpath="${jars.dir}/maven-ant-tasks-2.0.9.jar" resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant" />
+        <artifact:dependencies pathId="base.classpath" fileSetId="distributed.jars">
+            <pom file="pom.xml"/>
+        </artifact:dependencies>
+    </target>
+
+<target name="prepare" depends="prepare_local_classpath,prepare_repository_classpath">
+    <tstamp />
+    <mkdir dir="${build.dir}" />
+</target>
+
+
+<!-- =================================================================== -->
+<!-- Check to see what optional dependencies are available               -->
+<!-- =================================================================== -->
+<target name="check_for_optional_packages" depends="prepare">
+    <available property="jsdk.present"     classname="javax.servlet.http.HttpServlet"
+                                           classpathref="base.classpath" />
+    <available property="javamail.present" classname="javax.mail.internet.MimeMultipart"
+                                           classpathref="base.classpath" />
+    <available property="jaxp.present"     classname="javax.xml.parsers.DocumentBuilderFactory"
+                                           classpathref="base.classpath" />
+    <available property="rhino.present"    classname="org.mozilla.javascript.Context"
+                                           classpathref="base.classpath" />
+    <available property="jtidy.present"    classname="org.w3c.tidy.Tidy"
+                                           classpathref="base.classpath" />
+    <available property="nekoHTML.present" classname="org.cyberneko.html.HTMLConfiguration"
+                                           classpathref="base.classpath" />
+    <available property="junit.present"    classname="junit.framework.Test"
+                                           classpathref="base.classpath" />
+    <condition property="dom3.absent">
+        <contains string="${java.version}" substring="1.4"/>
+    </condition>
+</target>
+
+
+<!--  ===================================================================  -->
+<!--  Compiles the source code                                             -->
+<!--  ===================================================================  -->
+<target name="compile-for-java2" depends="prepare,check_for_optional_packages" if="dom3.absent">
+    <mkdir dir="${build.classes}" />
+    <javac srcdir="src-1.4" destdir="${build.classes}"/>
+</target>
+
+<target name="compile" depends="prepare,check_for_optional_packages,compile-for-java2">
+    <mkdir dir="${build.classes}" />
+    <javac srcdir="${src.dir}" destdir="${build.classes}"
+           debug="${debug}" deprecation="${deprecation}" optimize="${optimize}">
+        <classpath refid="base.classpath" />
+        <exclude name="**/JTidyHTMLParser.java" unless="jtidy.present" />
+        <exclude name="**/ScriptFilter.java" unless="nekoHTML.present" />
+        <exclude name="**/NekoHTMLParser.java" unless="nekoHTML.present" />
+        <exclude name="**/NekoDOMParser.java" unless="nekoHTML.present" />
+        <exclude name="**/servletunit/*" unless="jsdk.present" />
+        <exclude name="**/JUnitServlet.java" unless="junit.present" />
+        <exclude name="**/javascript/*" unless="rhino.present" />
+    </javac>
+</target>
+
+
+<!--  ===================================================================  -->
+<!--  Compiles the example code                                             -->
+<!--  ===================================================================  -->
+<target name="compile-examples" depends="compile">
+    <mkdir dir="${example.classes}" />
+    <javac srcdir="${examples.dir}" destdir="${example.classes}"
+           debug="${debug}" deprecation="${deprecation}" optimize="${optimize}">
+         <classpath>
+             <path refid="base.classpath" />
+             <pathelement location="${build.classes}" />
+         </classpath>
+    </javac>
+</target>
+
+
+<!--  ===================================================================  -->
+<!--  Runs the main example                                                -->
+<!--  ===================================================================  -->
+<target name="run-example" depends="compile-examples">
+    <java fork="true" classname="Example" dir="${basedir}">
+        <classpath>
+            <path refid="base.classpath"/>
+            <pathelement location="${example.classes}"/>
+            <pathelement location="${build.classes}"/>
+        </classpath>
+    </java>
+</target>
+
+
+<!--  ===================================================================  -->
+<!--  Compiles the test code                                               -->
+<!--  ===================================================================  -->
+<target name="testcompile" depends="compile,check_for_optional_packages">
+    <mkdir dir="${test.classes}" />
+    <javac srcdir="${tstsrc.dir}" destdir="${test.classes}"
+           debug="on" deprecation="off" optimize="off">
+        <classpath>
+            <path refid="base.classpath" />
+            <pathelement location="${build.classes}" />
+        </classpath>
+        <exclude name="**/servletunit/*" unless="jsdk.present" />
+        <exclude name="**/FileUploadTest.java" unless="javamail.present" />
+        <exclude name="**/XMLPageTest.java" unless="jaxp.present" />
+        <exclude name="**/javascript/*" unless="rhino.present" />
+        <exclude name="**/JUnitServletTest.java" unless="junit.present" />
+    </javac>
+		<copy todir="${test.classes}">          
+			<fileset dir="${tstsrc.dir}">       
+				<include name="**/*.html"/>     
+			</fileset>                          
+		</copy>
+</target>
+
+
+<!--  ===================================================================  -->
+<!--  Runs the test code                                                   -->
+<!--  ===================================================================  -->
+<target name="test" depends="testcompile" description="run JUnit Test Suite tests">
+    <java classname="${test.class}" fork="yes" >
+         <classpath>
+             <path refid="base.classpath" />
+             <pathelement location="${build.classes}" />
+             <pathelement location="META-INF" />
+             <pathelement location="${test.classes}" />
+         </classpath>
+    </java>
+</target>
+
+
+<!--  ===================================================================  -->
+<!--  Runs the test code                                                   -->
+<!--  ===================================================================  -->
+<target name="servlettest" depends="testcompile" description="run JUnit servlet Suite tests">
+    <java classname="${servlet.test.class}" fork="yes" >
+         <classpath>
+             <path refid="base.classpath" />
+             <pathelement location="${build.classes}" />
+             <pathelement location="${test.classes}" />
+         </classpath>
+    </java>
+</target>
+
+
+<!--  ===================================================================  -->
+<!--  Creates the jar archive                                              -->
+<!--  ===================================================================  -->
+<target name="jar" depends="compile" description="create the jar file">
+    <mkdir dir="${lib.dir}" />
+    <echo file="${build.dir}/info.txt">Manifest-Version: 1.0
+Sealed: false
+HttpUnit-Version: ${version}
+Build-Date: ${TODAY}
+Build-Time: ${TSTAMP}
+</echo>
+    <jar jarfile="${lib.dir}/${name}.jar" manifest="${build.dir}/info.txt">
+        <fileset dir="${build.classes}" includes="com/**"/>
+        <fileset dir="META-INF" includes="*.dtd"/>
+    </jar>
+</target>
+
+
+<!--  ===================================================================  -->
+<!--  Creates the API documentation                                        -->
+<!--  ===================================================================  -->
+<target name="javadocs" depends="prepare">
+    <mkdir dir="${javadoc.dir}" />
+    <javadoc packagenames="${packages}" sourcepath="${basedir}/${src.dir}"
+             destdir="${javadoc.dir}" author="true" version="true"
+             windowtitle="${Name} ${version} API" doctitle="${Name}"
+             footer="Copyright &amp;copy; 2000-2008 Russell Gold. See &lt;a target=&quot;_top&quot; href=&quot;../license.html&quot;&gt;license agreement&lt;/A&gt; for rights granted." >
+        <classpath refid="base.classpath"/>
+    </javadoc>
+</target>
+
+
+<!--  ===================================================================  -->
+<!--  Creates the tutorial archives                                        -->
+<!--  ===================================================================  -->
+<target name="tutorial" depends="jar">
+    <mkdir dir="${build.dir}/tutorial" />
+    <copy todir="${build.dir}/tutorial" >
+        <fileset dir="${docs.dir}/tutorial">
+            <include name="build.xml" />
+            <include name="web.xml" />
+            <include name="**/persistence/*.java" />
+        </fileset>
+    </copy>
+    <mkdir dir="${build.dir}/tutorial/jars" />
+    <zip zipfile="${docs.dir}/tutorial/task1.zip" basedir="${build.dir}/tutorial" includes="**" />
+</target>
+
+
+<!--  ===================================================================  -->
+<!--  Creates the distribution                                             -->
+<!--  ===================================================================  -->
+<target name="dist" depends="jar,javadocs,tutorial">
+    <mkdir dir="${archive.dir}" />
+    <copy todir="${archive.dir}" >
+        <fileset dir="." >
+            <include name="build.xml" />
+            <include name="readme.txt" />
+            <include name="index.html" />
+            <include name="site.css" />
+            <include name="favicon.ico" />
+            <include name="src/**" />
+            <include name="META-INF/**" />
+            <include name="test/**" />
+            <include name="examples/**" />
+            <include name="lib/*.*" />
+            <exclude name="**/activation.jar"/>
+            <exclude name="**/mailapi.jar" />
+            <include name="doc/**/*.*" />
+            <include name="doc/api/package-list" />
+        </fileset>
+    </copy>
+    <mkdir dir="${archive.dir}/jars"/>
+    <copy todir="${archive.dir}/jars">
+        <mapper type="flatten"/>
+        <fileset refid="distributed.jars" />
+    </copy>
+</target>
+
+
+<!--  ===================================================================  -->
+<!--  Packages the distribution with ZIP                                   -->
+<!--  ===================================================================  -->
+<target name="dist-zip" depends="dist" description="create the distribution with zip">
+    <zip zipfile="${name}-${version}.zip" basedir="${dist.dir}" includes="**" />
+</target>
+
+
+<!--  ===================================================================  -->
+<!--  Publishes to a web site                                              -->
+<!--  ===================================================================  -->
+<target name="publish" depends="dist-zip">
+    <mkdir dir="${web.dir}" />
+    <copy todir="${web.dir}" >
+        <fileset dir="." includes="site.css,favicon.ico,index.html,doc/**"/>
+    </copy>
+    <antcall target="update-website" />
+</target>
+
+
+    <!--  ===================================================================  -->
+    <!--  Compiles the website generator                                       -->
+    <!--  ===================================================================  -->
+    <target name="compile-site" depends="prepare">
+        <mkdir dir="${website.classes}" />
+        <javac srcdir="${website.dir}" destdir="${website.classes}"
+               debug="${debug}" deprecation="${deprecation}" optimize="${optimize}">
+             <classpath>
+                 <pathelement location="${jars.dir}/quicksite.jar" />
+                 <path refid="base.classpath" />
+             </classpath>
+        </javac>
+    </target>
+
+
+<!--  ===================================================================  -->
+<!--  Updates the web site                                              -->
+<!--  ===================================================================  -->
+<target name="update-website" depends="compile-site">
+    <copy todir="${web.dir}">
+        <fileset dir="." includes="site.css,favicon.ico,doc/images/**,doc/tutorial/*.html" />
+    </copy>
+    <java classname="com.meterware.httpunit.site.WebSite" fork="yes" >
+        <classpath>
+            <path refid="base.classpath" />
+            <pathelement location="${website.classes}" />
+            <pathelement location="${jars.dir}/quicksite.jar" />
+        </classpath>
+        <arg path="${web.dir}"/>
+    </java>
+</target>
+
+
+<!--  ===================================================================  -->
+<!--  Packages the web site with ZIP                                       -->
+<!--  ===================================================================  -->
+<target name="publish-zip" depends="publish">
+    <zip zipfile="${name}_website_${version}.zip" basedir="${web.dir}" includes="**" />
+</target>
+
+
+<!--  ===================================================================  -->
+<!--  Cleans up generated stuff                                            -->
+<!--  ===================================================================  -->
+<target name="clean">
+    <delete dir="${build.dir}" />
+    <delete dir="${dist.dir}" />
+    <delete dir="${web.dir}" />
+</target>
+
+
+<!--  ===================================================================  -->
+<!--  Total cleanup                                                        -->
+<!--  ===================================================================  -->
+<target name="total-clean" depends="clean">
+    <delete file="${name}_*.zip" quiet="true" />
+    <delete dir="${docs.dir}/api" />
+    <delete dir="${docs.dir}/tutorial/*.zip" />
+    <delete dir="${lib.dir}" />
+</target>
+
+</project>

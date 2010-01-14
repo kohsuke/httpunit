@@ -1,0 +1,68 @@
+<?xml version='1.0' ?>
+<developers>
+    <group type="Maintainers">
+        <developer username="russgold" name="Russell Gold" email="russgold@httpunit.org">
+            The author and maintainer of HttpUnit, Russell has been developing software for over 30 years, and has been
+            programming in Java since 1996.  He is currently working for Oracle in Moorestown, NJ on the OC4J application
+            server.
+        </developer>
+    </group>
+    <group type="Committers">
+        <developer username="wolfgang_fahl" name="Wolfgang Fahl" email="wf@bitplan.com">
+        Wolfgang has been using httpunit for testing his UML2PHP project result since 2004. He started
+        being a committer in 2007. Wolfgang has worked with computers since 1979 when he was 16 years old.
+        He studied computer science at RWTH Aachen, germany. He is a specialist in software engineering since 1991  
+        and trainer for software architects since 2003. He learned Java the same year as Russell: 1996.
+        Test first software development is a key concept of Wolfgang's work since the same year.
+        He is currently founder and CEO of BITPlan GmbH, Düsseldorf.
+        </developer>
+    </group>
+    <group type="Contributors (partial list)">
+        <developer name="Artashes Aghajanyan" email="Artashes.Aghajanyan@lycos-europe.com"/>
+        <developer name="Jason Bedell" email="jason.bedell@digitalevergreen.com"/>
+        <developer name="Geert Bevin" email="gbevin@uwyn.com" />
+        <developer name="Andrew Bickerton" email="andrewb@pwd.hp.com"/>
+        <developer name="Brendan Boesen" email="bboesen@tpg.com.au"/>
+        <developer name="Sergey Bondarenko" email="bond@supportwizard.com"/>
+        <developer name="Ken Corbin" email="Ken.Corbin@Summit.Fiserv.com"/>
+        <developer name="Raphael Corre" email="raphael_corre@yahoo.com"/>
+        <developer name="Richard Harris" email="richard.harris@mckesson.com" />
+        <developer name="Larry Hamel" email="httpunit@codeguild.com"/>
+        <developer name="Daniel Jasmin" email="djasmin@rational.com"/>
+        <developer name="David D. Kilzer" email="ddkilzer@users.sourceforge.net"/>
+        <developer name="Patrick Lightbody" email="Patrick.Lightbody@spokesoftware.com"/>
+        <developer name="George Murnock" email="gmurnock@bea.com"/>
+        <developer name="Mark Luty" email="mluty@pace2020.com"/>
+        <developer name="Michael McCallum" email="michael@gholam.net"/>
+        <developer name="Brian O'Kelley" email="cokelley@users.sourceforge.net"/>
+        <developer name="Daniel Sheppard" email="daniels@pronto.com.au"/>
+        <developer name="Ville Skytt&amp;auml;"/>
+        <developer name="Navid Vahdat" email="navid@vahdat.de" />
+        <developer name="Troy Waldrep" email="twaldrep@datajunction.com"/>
+        <developer name="Ron Webster" email="ron.webster@genclr.com"/>
+        <developer name="Bernhard Wagner" email="bw@xmlizer.biz"/>
+        <developer name="ahansen"/>
+        <developer name="Alexey Bulat"/>
+        <developer name="Christoph"/>
+        <developer name="Dan Allen"/>
+        <developer name="David D Kilzer"/>
+        <developer name="fabrizio giustina"/>
+        <developer name="Glen Stampoultzis"/>
+        <developer name="gklopp"/>
+        <developer name="Hugh Winkler"/>
+        <developer name="James Abley"/>
+        <developer name="Jord Sonneveld"/>
+        <developer name="kauffmann81"/>
+        <developer name="Mark Childerson"/>
+        <developer name="Matt"/>
+        <developer name="Peter Phillips"/>
+        <developer name="Rafal Krzewski"/>
+        <developer name="Richard Lee"/>
+        <developer name="Satish Kolli"/>
+        <developer name="Serguei Khramtchenko"/>
+        <developer name="Seth Ladd"/>
+        <developer name="Tim"/>
+        <developer name="Ville Skytt"/>
+        <developer name="Yu Chen"/>
+    </group>
+</developers>

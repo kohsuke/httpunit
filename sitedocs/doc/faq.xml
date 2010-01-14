@@ -1,0 +1,234 @@
+<?xml version='1.0' ?>
+<faqs>
+    <section title='Problems Getting Started'>
+        <faq id='Cannot unzip'>
+            <question>Why can't I unzip the download library?</question>
+            <answer>HttpUnit is archived using the classes in the java.util.zip package.
+                    Some older Unzip programs cannot understand this format.
+                    If you are using WinZip, stick to version 7.0 or later.</answer>
+        </faq>
+        <faq id="org.xml.sax">
+            <question>What is the org.xml.sax package?</question>
+            <answer>You may be getting compile or runtime errors asking for the org.xml.sax package.
+                    You need to have xerces or another XML parser in your classpath. Xerces is included in the download.</answer>
+        </faq>
+        <faq id="api-help">
+            <question>I don't understand how the ... API works.</question>
+            <answer><![CDATA[The best way to understand how the API works is to look at the samples in the <tt>test</tt> directory.
+                     This contains an example of just about every feature of the library and is used to verify that they continue to work.
+                     Of course, if you know a tech writer who would like to contribute to improving the documentation, that is always welcome :)]]></answer>
+        </faq>
+    </section>
+
+    <section title="Server Issues">
+        <faq>
+            <question>Is https supported?</question>
+            <url>sslfaq.html</url>
+        </faq>
+        <faq id="proxy">
+            <question>Can I use HttpUnit through a proxy server?</question>
+            <answer><![CDATA[Yes. Call <a href="api/com/meterware/httpunit/WebClient.html#setProxyServer(java.lang.String, int)">
+                    <code>WebClient.setProxyServer( host, port )</code></a>before sending your request, or if you
+                    need to specify a username and password, call
+                    <a href="api/com/meterware/httpunit/WebClient.html#setProxyServer(java.lang.String, int, java.lang.String, java.lang.String)">
+                    <code>WebClient.setProxyServer( host, port, username, password )</code></a>.]]></answer>
+        </faq>
+        <faq id="masquerade">
+            <question>How can I handle certificates from a test machine?</question>
+            <answer><![CDATA[Often you will need to run your secure website - complete with certificates - from a test
+                    server. Under most conditions, this will cause a validation problem, as the JSSE detects that the
+                    certificate does not match the requested server. You can "trick" HttpUnit into accepting the certificate
+                    as follows:<p>
+                    Assume that your certificate is for your real machine at <code>realserver.domain.com</code> and your
+                    test machine is at the IP address: 192.168.1.23. You want your tests to send requests to
+                    <code>realserver.domain.com</code> (since that is what your certificates expect), but to actually
+                    go to the test machine.<p>
+                    First, create a <a href="api/com/meterware/httpunit/DNSListener.html"><code>DNSListener</code></a>:
+                    <pre>DNSListener aListener = <b>new</b> DNSListener() {
+    <b>public</b> String getIpAddress( String hostName ) {
+        if (hostName.equals( "realserver.domain.com" )) <b>return</b> "192.168.1.23";
+        <b>return</b> hostName;
+    }
+};</pre>This listener substitutes the test IP address for the specified server name. Now specify this listener
+                    for your client by calling
+                    <a href="api/com/meterware/httpunit/ClientProperties.html#setDnsListener(com.meterware.httpunit.DNSListener)">
+                    <code>wc.getClientProperties().setDnsListener( aListener )</code></a>.
+                    All subsequent requests will be rerouted as you specify, but the security layer should think it is coming
+                    from the named server.]]></answer>
+        </faq>
+        <faq id="charset">
+            <question>Why isn't HttpUnit handling my non-English pages?</question>
+            <answer><![CDATA[When no Content-Type header is specified, HTML 1.1 says that the character set is to be taken as iso-8859-1.
+                    Unfortunately, some HTTP servers do not send this parameter correctly, and many browsers provide a workaround
+                    to permit the user to determine the character set in some other fashion.  To imitate this behavior,
+                    HttpUnit allows you to set the expected character set for future pages by calling
+                    <a href="api/com/meterware/httpunit/HttpUnitOptions.html#setDefaultCharacterSet(java.lang.String)"><code>HttpUnitOptions.setDefaultCharacterSet()</code></a>.
+                    This setting will not apply to those pages for which the server specifies the character set.</p>
+                    <p>Non-English form handling is supported as well. Any parameter values entered into a form will be encoded as the same
+                    character set as the document containing the form. The server code will then have to handle those characters
+                    appropriately. In Java, that would be converting them to Unicode with statements such as
+                    <pre>String rawName = request.getParameter( "name" );
+String japaneseName = <b>new</b> String( name.getBytes("8859_1"), "EUC_JP" );</pre>
+                    where the proper encoding should be substituted for "EUC_JP". The <code>getBytes</code> call is needed to extract
+                    the raw bytes from the parameter string.]]></answer>
+        </faq>
+        <faq id="timeout">
+            <question>How does HttpUnit handle request timeouts?</question>
+            <answer>Badly. Unfortunately, through JDK 1.3, HttpURLConnection (used by HttpUnit to access web servers) has no support for timeouts.
+                    Supposedly, this is changed in JDK 1.4, but HttpUnit does not support the new feature as yet.</answer>
+        </faq>
+        <faq id="rejected cookies">
+            <question>Why isn't HttpUnit seeing cookies from my site?</question>
+            <answer><![CDATA[According to the <a href="http://www.faqs.org/rfcs/rfc2965.html">Cookie specification</a>,
+                    sites may specify a domain and path to restrict the scope of their cookies. These specifications
+                    must follow certain rules, and the vast majority of sites do. Unfortunately, there are some
+                    popular sites (such as Yahoo.com) which do not. By default, HttpUnit is very strict about
+                    implementing the spec, and will reject such cookies. You can control this behavior by calls to the
+                    <a href="api/com/meterware/httpunit/cookies/CookieProperties.html">CookieProperties</a> class.
+                    If you suspect that this is happening, you can also register a
+                    <a href="api/com/meterware/httpunit/cookies/CookieListener.html">CookieListener</a> to watch for cookies
+                    being rejected.]]></answer>
+        </faq>
+    </section>
+
+    <section title="Form Handling Problems">
+        <faq id="uncheck">
+            <question>How do I uncheck a checkbox?</question>
+            <answer><![CDATA[The setParameter call lets you specify the values per parameter name. An unchecked checkbox has no value to transmit, so you would call:
+                    <pre><code>    form.setParameter( "checkbox-name", new String[0] );</code></pre> or
+                    <pre><code>    form.removeParameter( "checkbox-name" );</code></pre>
+                    If the checkbox's name is unique, you can say:
+                    <pre><code>    form.setCheckbox( "checkbox-name", false );</code></pre> or
+                    <pre><code>    form.toggleCheckbox( "checkbox-name" );</code></pre>]]></answer>
+        </faq>
+        <faq id="hidden">
+            <question>Why can't I change hidden parameter values?</question>
+            <answer><![CDATA[HttpUnit is intended primarily to imitate what a user could do. Since a user cannot change
+                    hidden parameters directly, HttpUnit stops you from doing it in your code as part of its validation
+                    of parameters against the form containing them. If you have to change these values, you have a couple of choices:
+                    <ul><li>Rather than setting the parameters directly on the form, call
+                    <a href="api/com/meterware/httpunit/WebForm.html#newUnvalidatedRequest()">
+                    <code>WebForm.newUnvalidatedRequest()</code></a>
+                    (specifying any submit button information if necessary) to obtain a <tt>WebRequest</tt> copied from
+                    the form but not tied to it. You will then be able to set any values you like in this request.
+                    Note that parameter order is not guaranteed when such a request is submitted, nor are any JavaScript events fired.</li>
+                    <li>You can call <code>&lt;form&gt;.getScriptableObject().setParameterValue( &lt;name&gt;, &lt;value&gt; );</code> to change
+                    the underlying value in the form. This will behave the way JavaScript does - resetting the form will now restore this value,
+                    rather than the original one.</li></ul>]]></answer>
+        </faq>
+        <faq id="button click">
+            <question>How do I get the response when I click a button?</question>
+            <answer><![CDATA[When you call Button.click, a number of things can happen, depending on the definition of the button.
+                    Unfortunately, it is then impossible to predict what, if any, response is relevant. The method therefore
+                    does not return WebResponse. In most cases, it is the main window of your browser that you care about
+                    and you can always obtain that by calling
+                    <a href="api/com/meterware/httpunit/WebClient.html#getCurrentPage()"><code>client.getCurrentPage()</code></a>.]]></answer>
+        </faq>
+    </section>
+
+
+    <section title="Links and Images">
+        <faq id="image links">
+            <question>How do I find a link for a given image?</question>
+            <answer><![CDATA[It is not uncommon to encounter a structure such as
+            &lt;a href="something"&gt;&lt;img src=blah name=my_image&gt;&lt;/a&gt;. The find this link, the first step
+            is to find the image, for which a number of methods are defined, allowing images to be found based on name,
+            src attribute, id, or alt text. Given the image, the link is easily obtained by calling
+            <a href="api/com/meterware/httpunit/WebImage.html#getLink()"><code>image.getLink()</code></a>]]></answer>
+        </faq>
+    </section>
+
+    <section title="JavaScript support">
+        <faq id="javascript">
+            <question>How do I use HttpUnit to test my pages that use JavaScript?</question>
+            <answer><![CDATA[For most purposes, You should not have to do anything special; however, not all JavaScript constructs are supported as yet.
+                    See <a href="javascript-support.html">the list of supported JavaScript features</a> for more information.]]></answer>
+        </faq>
+        <faq id="norhino">
+            <question>JavaScript is not being executed at all. Why not?</question>
+            <answer>If you do not have the Rhino JAR (js.jar) in your classpath, JavaScript features do not work.</answer>
+        </faq>
+        <faq id="disable scripting">
+            <question>How do I turn off scripting for certain tests?</question>
+            <answer><![CDATA[If you call <a href="api/com/meterware/httpunit/HttpUnitOptions.html#setScriptingEnabled(boolean)"><code>HttpUnitOptions.setScriptingEnabled( false );</code></a>
+                    JavaScript will not be interpreted.]]></answer>
+        </faq>
+        <faq id="nofunction">
+            <question>My JavaScript works in a browser, but HttpUnit says "ReferenceError: ... is not defined"</question>
+            <answer>This usually indicates that you are calling a function which contains statements that HttpUnit does not understand.
+                    Rhino unfortunately does not provide a very helpful error message in such cases. Try removing statements from the
+                    function until you find out which one is causing the problem and then submit a request for the offending construct to be supported.</answer>
+        </faq>
+        <faq id="alerts">
+            <question>How do I test JavaScript alert boxes?</question>
+            <answer><![CDATA[HttpUnit automatically acts as though you have clicked the OK button and queues up a list of messages generated by
+                    calls to the alert() function. You can see the messages by making successive calls to
+                    <a href="api/com/meterware/httpunit/WebClient.html#popNextAlert()"><code>client.popNextAlert()</code></a>.
+                    each of which will return the next alert message and remove it from the queue. You can at any time
+                    call <a href="api/com/meterware/httpunit/WebClient.html#getNextAlert()"><code>client.getNextAlert()</code></a>
+                    to see the next message without removing it. If there are no messages left in the queue, these methods
+                    simply return an empty string.]]></answer>
+        </faq>
+        <faq id="dialogs">
+            <question>How do I test JavaScript popup dialogs?</question>
+            <answer><![CDATA[You can register a <a href="api/com/meterware/httpunit/DialogResponder.html"><code>DialogResponder</code></a>
+                    by calling <a href="api/com/meterware/httpunit/WebClient.html#setDialogResponder(DialogResponder)">
+                    <code>client.setDialogResponder( responder )</code></a>, specifying an object which should be invoked
+                    whenever JavaScript code invokes a <code>prompt()</code> or <code>confirm()</code> function. The <code>DialogResponder</code>
+                    interface has two methods. When a <code>confirm()</code> function is encountered, HttpUnit will invoke the
+                    <a href="api/com/meterware/httpunit/DialogResponder.html#getConfirmation(java.lang.String)"><code>getConfirmation</code></a>
+                    method, passing the prompt as a parameter. The method should return <code>true</code> to indicate the clicking of the OK
+                    button or <code>false</code> to indicate that the CANCEL button was clicked.<p>
+                    When a <code>prompt()</code> function is encountered, HttpUnit will invoke the
+                    <a href="api/com/meterware/httpunit/DialogResponder.html#getUserResponse(java.lang.String, java.lang.String)"><code>getUserResponse</code></a>
+                    method, passing the prompt and default response. The method should return the response appropriate for the test.]]></answer>
+        </faq>
+        <faq id="unsupported">
+            <question>How do I handle a page that uses JavaScript features that HttpUnit does not support?</question>
+            <answer><![CDATA[If you call
+                    <a href="api/com/meterware/httpunit/HttpUnitOptions.html#setExceptionsThrownOnScriptError(boolean)">
+                        <code>HttpUnitOptions.setExceptionsThrownOnScriptError( false );</code></a>
+                    problems will be recorded but will not throw exceptions. You can see the list of problems detected by calling
+                    <a href="api/com/meterware/httpunit/HttpUnitOptions.html#getScriptErrorMessages()">
+                        <code>HttpUnitOptions.getScriptErrorMessages();</code>
+                    </a>]]></answer>
+        </faq>
+        <faq id="text">
+            <question>I called document.write() in my page, but getText() does not show the results! Why not?</question>
+            <answer><![CDATA[The execution of scripts only affects the parsed result. WebResponse.getText() shows the <i>original</i>
+                    text in the page. You will see the changed text only if you examine text inside a parsed item such as a form, link, or table.]]></answer>
+        </faq>
+    </section>
+
+    <section title="ServletUnit usage">
+        <faq id="session">
+            <question>How can I see the servlet session between calls?</question>
+            <answer><![CDATA[Servlet session is maintained on the server. Therefore, if you want to do this, you must be using
+                    <a href="servletunit-intro.html">ServletUnit</a>.
+                    Once you have that working, you can get take advantage of the power of ServletUnit to get at internal values,
+                    using the <a href="api/com/meterware/servletunit/InvocationContext.html"><code>InvocationContext</code></a> object. For example,
+<pre><code>
+ServletUnitClient client = ...          // the client you have been using
+client.getResponse( servlet-url );      // invoke your servlet normally
+
+// now get an invocation context using the <i>same</i> URL used to invoke the servlet
+InvocationContext ic = client.newInvocationContext( servlet-url );
+// obain the session just used. Note: pass false to avoid creating it if it does not already exist
+HttpSession session = ic.getRequest().getSession( false );</code></pre>
+
+Now you can examine the contents of the session to see what the servlet left in it.]]></answer>
+        </faq>
+
+        <faq id="JSP">
+            <question>Can I use JSPs with ServletUnit?</question>
+            <answer>Absolutely! But since you are now emulating the servlet environment, you will need to make sure that you have access
+                    to the relevant classes. By default, ServletUnit is configured to use Jasper, the JSP engine which is part of Tomcat.
+                    You will therefore need the Jasper jar in your classpath, along with any on which it depends.  Once you have done that,
+                    your JSPs should run, just as they would in Tomcat.</answer>
+        </faq>
+
+    </section>
+</faqs>
+
+
+

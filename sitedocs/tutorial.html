@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>HttpUnit Tutorial - intro</title>
+<LINK REL="stylesheet" HREF="tutorial.css" TYPE="text/css">
+</head>
+
+<body>
+<p>This tutorial should help you to learn to use HttpUnit to develop and test your web sites. It will take you through the incremental
+development of a simple servlet-based web application using a test-first approach. That is, first you are encouraged to
+write and execute a test for the next piece of functionality to be added, verify that the test fails (demonstrating that
+the functionality is not in place), and then implement the functionality and verify that the test now passes.</p>
+
+<p>The initial tasks will use the <code>ServletRunner</code> class, thus bypassing the need for a web browser or servlet
+engine. Later tasks will require a web browser and a servlet engine, and use <code>WebConversation</code>.</p>
+
+<h2>The Application</h2>
+
+<p>Our application is an office sport betting pool. An administrator is designated to manage the pool, which includes
+opening and closing the betting. Entrants select the winner in each of the up to 10 games defined by the administrator
+and also guess the total score in one of those games, as designated by the administrator. The winner of the pool is the
+one who got the most winners correct, with any ties going to the person whose predicted total score in the tie-breaker game
+was closest to the actual final score.</p>
+
+<p>We will identify the following uses of the system:</p>
+
+<dl class="story-list"><dt>1.1 Administrator Opens Pool</dt>
+<dd>The administrator defines up to ten games, specifying the home and away team for each game. He also selects one of
+these games as the tie-breaker. Once the data is correct, the administrator opens the pool for betting.</dd>
+
+<dt>1.2 Administrator Closes Pool</dt>
+<dd>After the pool is open, the administrator may at any time close the pool, thus preventing any
+further bets or changes to existing bets.</dd>
+
+<dt>1.3 Administrator Posts Results</dt>
+<dd>After the pool is closed, the administrator enters actual scores for each of the games played.
+Once all scores have been entered, the administrator posts the results.</dd>
+
+<dt>2.1 Users enters a bet</dt>
+<dd>After the pool is open, a user may sign on and create a bet, predicting the winner of each game
+and the total score of the tie-breaker game. The user may change his bet until the pool is closed.</dd>
+
+<dt>2.2 User views results</dt>
+<dd>Once the results have been posted, a user may examine his own bet to see how well he did. The
+system will indicate the correct predictions and the user's rank in the pool.</dd>
+
+<dt>2.3 User views standings</dt>
+<dd>Once the results have been posted, a user may view a list of all bidders ranked by number of
+correct predictions.</dd>
+</dl>
+
+<p>This application is fairly simple, and hardly robust, but contains more than enough interactions to allow us to
+explore development and testing with HttpUnit.
+
+<h2>Tutorial Organization</h2>
+
+<p>Each section of the tutorial will address a specific use of the system, and show how HttpUnit and ServletUnit can be used
+to write tests which verify that functionality. You should begin each section by copying the initial directory, which includes
+an ant build script and some classes that you will need to complete it.  Running the ant script will compile the code and
+run the tests. If you are not using ant, compile and run tutorial.TutorialTestSuite. After you implement each test,
+it should fail until you then add the implementation.</p>
+
+<p>Tasks</p>
+
+<ul>
+<li><a href="task1.html">Task 1: Create the pool editor</a>
+<li><a href="task2.html">Task 2: Control access to the application</a>
+</ul>
+
+
+
+</body>
+</html>

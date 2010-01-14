@@ -1,0 +1,27 @@
+<page>
+    <section>
+<p>The normal way to access web sites is via a browser; however, there are times when it is desirable to
+bypass the browser and access a site from a program, including:
+<ul><li><ref page="automated-testing">automated web site testing</ref></li>
+<li>using a web-site as part of a distributed application</li></ul>
+
+HttpUnit makes this easy. Written in Java,
+HttpUnit emulates the relevant portions of browser behavior, including
+form submission, <ref page="Javascript-support">JavaScript</ref>,
+basic <a href="ftp://ftp.isi.edu/in-notes/rfc2617.txt">http authentication</a>,
+cookies and automatic page redirection, and allows
+Java test code to examine returned pages either as text, an XML DOM, or containers of forms, tables, and links.</p>
+<p>
+A companion framework, <ref page="servletunit-intro">ServletUnit</ref> is included in the download.
+</p>
+    </section>
+
+<section title="What is it?">
+<p><strong>HttpUnit</strong> is a free, <ref page="license">open source</ref> Java API for accessing web sites without a browser,
+and is ideally suited for automated unit testing of web sites when combined with a
+Java unit test framework such as <a href="http://www.junit.org">JUnit</a>.
+It was designed and implemented by <developer>Russell Gold.</developer></p>
+</section>
+
+
+</page>

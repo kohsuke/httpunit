@@ -1,0 +1,64 @@
+<?xml version='1.0' ?>
+<citations>
+    <section title='HttpUnit Extensions and Wrappers'>
+        <citation name="WebWalker" url="http://webwalker.sourceforge.net">
+            Provides an XML wrapper to simplify web testing for non-Java programmers
+        </citation>
+        <citation name="morebot" url="http://morebot.sourceforge.net">
+            A Java spider for smoke-testing web sites easily
+        </citation>
+    </section>
+
+    <section title="Articles">
+        <citation name="Test Web applications with HttpUnit"
+                  url="http://www.javaworld.com/javaworld/jw-04-2004/jw-0419-httpunit.html">
+            19 April 2004: Balazs Fejes, javaworld.com
+        </citation>
+        <citation name="Build a Java Web App Using HttpUnit and the Test-driven Methodology, Part II"
+                  url="http://www.devx.com/Java/Article/17991">
+            4 December 2003: Wellie Chao, DevX.com
+        </citation>
+        <citation name="Build a Java Web App Using HttpUnit and the Test-driven Methodology, Part I"
+                  url="http://www.devx.com/Java/Article/17908">
+            25 November 2003: Wellie Chao, DevX.com
+        </citation>
+        <citation name="Black Box Web Testing with HttpUnit"
+                  url="http://www.onjava.com/pub/a/onjava/2003/05/07/blackboxwebtest.html">
+            7 May 2003: Giora Katz-Lichtenstein, ONJava.com
+        </citation>
+        <citation name="HttpUnit: A Civilized Way to Test Web Applications in WebSphere Studio"
+                  url="http://www7b.software.ibm.com/wsdd/library/techarticles/0303_bhogal/bhogal.html">
+            March 2003: Kulvir Singh Bhogal, IBM Software Services for WebSphere
+        </citation>
+        <citation name="Test entire Web applications with HttpUnit"
+                  url="http://www.zdnet.com.au/builder/program/java/story/0,2000034779,20264830,00.htm">
+            26 April 2002: Jamie Scheinblum, ZDNet Australia
+        </citation>
+    </section>
+
+    <section title="Book References">
+        <citation name="Java Extreme Programming Cookbook" url="http://www.oreilly.com/catalog/jextprockbk/">
+            March 2003: Eric M. Burke and Brian M. Coyner, O'Reilly &amp; Associates.
+            Detailed examples of XP development includes use of HttpUnit to develop web applications. Covers HttpUnit 1.4
+        </citation>
+
+        <citation name="Java Development with Ant" url="http://www.manning.com/hatcher/">
+            August 2002: Erik Hatcher and Steve Loughran, Manning Publications.
+            An excellant text on using ant for development. Also includes a chapter on HttpUnit. Covers HttpUnit 1.4
+        </citation>
+
+        <citation name="Java Tools for Extreme Programming: Mastering Open Source Tools, including Ant, JUnit, and Cactus"
+                  url="http://www.wiley.com/WileyCDA/WileyTitle/productCd-047120708X.html">
+            2002: Richard Hightower and Nicholas Lesiecki, John Wiley &amp; Sons.
+            Contains a simple example using HttpUnit and describes the API. Covers HttpUnit 1.4
+        </citation>
+    </section>
+
+    <section title="Blog Postings">
+        <citation name="Testing Web Applications with HttpUnit (Don't worry, it's not boring!)"
+                  url="http://fb2.hu/x10/Articles/HttpUnit.html">
+            22 February 2004: Balazs Fejes, 10x More Productive Blog!
+        </citation>
+    </section>
+
+</citations>

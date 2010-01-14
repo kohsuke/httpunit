@@ -1,0 +1,154 @@
+<HEAD><TITLE>HttpUnit Cookbook</TITLE></HEAD>
+<body>
+
+Here is a brief description of how you can use HttpUnit with JUnit to test your own web sites.
+
+<H2>Obtaining a web page response</H2>
+The center of HttpUnit is the <A HREF="api/com/meterware/httpunit/WebConversation.html">WebConversation</A> class,
+which takes the place of a browser talking to a single site. It is responsible for maintaining session context,
+which it does via cookies returned by the server.  To use it, one must create a
+<A HREF="api/com/meterware/httpunit/WebRequest.html">request</A> and ask the WebConversation for a response.<BR>
+For example:
+<PRE>
+    WebConversation wc = <b>new</b> WebConversation();
+    WebRequest     req = <b>new</b> GetMethodWebRequest( "http://www.meterware.com/testpage.html" );
+    WebResponse   resp = wc.getResponse( req );
+</PRE>
+The <A HREF="api/com/meterware/httpunit/WebResponse.html">response</A> may now be manipulated either as
+pure text (via the <CODE>getText()</CODE> method), as a DOM (via the <CODE>getDOM()</CODE> method),
+or by using the various other methods described below.  Because the above sequence is so common, it can be abbreviated to:
+<PRE>
+    WebConversation wc = <b>new</b> WebConversation();
+    WebResponse   resp = wc.getResponse( "http://www.meterware.com/testpage.html" );
+</PRE>
+
+<H2>Examining and following links</H2>
+The simplest and most common form of navigation among web pages is via links. HttpUnit allows users to find links
+by the text within them, and to use those links as new page requests. For example, this page contains a link to the JavaDoc
+for the <CODE>WebResponse</CODE> class, above.  That page could therefore be obtained as follows:
+<PRE>
+    WebConversation wc = <b>new</b> WebConversation();
+    WebResponse   resp = wc.getResponse( "http://www.httpunit.org/doc/cookbook.html" ); // read this page
+    WebLink       link = resp.getLinkWith( "response" );                                // find the link
+    link.click();                                                                       // follow it
+    WebResponse   jdoc = wc.getCurrentPage();                                           // retrieve the referenced page
+</PRE>
+Image links can be found as well. The <CODE>WebResponse.getLinkWithImageText()</CODE> method can look up links by examining
+the ALT text, or the <CODE>HttpUnitOptions.setImagesTreatedAsAltText</CODE> method can cause ALT text to be treated as
+ordinary searchable text.
+
+
+<H2>Using the table structure of a web page</H2>
+Many web designers make heavy use of tables to control the page formatting. You can take advantage of this by looking
+at the tables in the page as discrete elements. The :<CODE>getTables()</CODE> method will return an array of the top-level
+tables in the page (that is, those which are not nested within other tables), in the order in which they appear in the
+document.  Given a table, you can ask for one of its cells, and treat the result either as text or a DOM or ask for
+and tables, links, or forms nested within it. For example, the following code will confirm that the first table in the page
+has 4 rows and 3 columns, and that there is a single link in the last cell of the first row:
+<PRE>
+    WebTable table = resp.getTables()[0];
+    assertEquals( "rows", 4, table.getRowCount() );
+    assertEquals( "columns", 3, table.getColumnCount() );
+    assertEquals( "links", 1, table.getTableCell( 0, 2 ).getLinks().length );
+</PRE>
+
+In most cases, the purpose of a test is to verify the text, rather than the formatting. HttpUnit provides shortcuts to do this.
+For example, imagine that the second table in the page should look like this:
+<DIV ALIGN="LEFT">
+<TABLE CELLPADDING=1 CELLSPACING=2 WIDTH=150 BORDER=1>
+<TR><TH>Name</TH><TH>Color</TH></TR>
+<TR><TD>gules</TD><TD>red</TD></TR>
+<TR><TD>sable</TD><TD>black</TD></TR>
+</TABLE>
+</DIV>
+
+<P>The following JUnit code will verify it:<PRE>
+    String[][] colors = resp.getTables()[1].asText();
+    assertEquals( "Name",  colors[0][0] );
+    assertEquals( "Color", colors[0][1] );
+    assertEquals( "gules", colors[1][0] );
+    assertEquals( "red",   colors[1][1] );
+    assertEquals( "sable", colors[2][0] );
+    assertEquals( "black", colors[2][1] );
+</PRE>
+Note that the <CODE>asText()</CODE> method, used to convert an entire table into an array of String ignores all formatting tags.
+
+At times, entire rows or columns of a table may be used for appearance purposes only. You can ignore rows or columns consisting
+only of images or empty tags by invoking <CODE>purgeEmptyCells</CODE> on the table.
+
+In many cases, tables begin with some fixed text and the purpose of the test is to verify the dynamic portion. As a general rule,
+the first cell will contain something fixed and you can search for it - even if the table is nested inside other tables. Thus,
+the above table could have been found with:
+<PRE>String[][] colors = resp.getTableStartingWith( "Name" );
+</PRE>
+which has the advantage of being immune to many page formatting changes which might make it the third or fourth table.
+
+<H2>Working with forms</H2>
+<P>A dynamic web site tends to have many html forms, each of which contains various kinds of controls: text boxes, pull-down menus,
+radio buttons, and so on. The HTML for these controls vary widely; however, the intent is roughly the same, so HttpUnit
+makes them look the same.</P>
+
+<P>There are a few basic things that a tester is likely to want to do with a form. The most obvious first step is to verify the
+controls and their default values; if they are correct, the tester will generally make some changes and submit the form to
+see how the system responds.  HttpUnit makes both tasks easy.</P>
+
+<P>The examples below assume the following form definition:</P>
+
+<TABLE CELLPADDING="3" BORDER="1"><TR><TD><FORM>
+Restaurant Name:<INPUT type="text" NAME="Name" VALUE="La Cerentolla"><BR>
+Restaurant Type:
+<INPUT type="radio" NAME="Food" VALUE="Chinese" CHECKED>Chinese</INPUT>
+<INPUT type="radio" NAME="Food" VALUE="TexMex">Tex/Mex</INPUT>
+<INPUT type="radio" NAME="Food" VALUE="Italian">Italian</INPUT><BR>
+Location:<SELECT NAME="Location"><OPTION VALUE="CenterCity">Center City</OPTION>
+<OPTION VALUE="Northeast">Northeast</OPTION><OPTION VALUE="Manayunk" SELECTED>Manayunk</OPTION>
+<OPTION VALUE="PennsLanding">Penns Landing</OPTION></SELECT><BR>
+<INPUT type="checkbox" NAME="CreditCard" CHECKED>Accepts Credit Cards</INPUT><BR>
+<BR><INPUT TYPE="submit" VALUE="Update">
+</FORM></TD></TR></TABLE>
+
+The default values may be checked as follows:
+<PRE>
+    WebForm form = resp.getForms()[0];      // select the first form in the page
+    assertEquals( "La Cerentolla", form.getParameterValue( "Name" ) );
+    assertEquals( "Chinese",       form.getParameterValue( "Food" ) );
+    assertEquals( "Manayunk",      form.getParameterValue( "Location" ) );
+    assertEquals( "on",            form.getParameterValue( "CreditCard" ) );
+</PRE>
+Note that all controls are treated alike, with the exception of the checkbox.
+
+<P>Simulating the submission of the form can be done most simply by obtaining the form object and calling its 'submit'
+method, possibly modifying the form parameters beforehand. For example, to correct the restaurant type and
+indicate that it does not accept credit cards:
+<PRE>
+    form.setParameter( "Food", "Italian" );      // select one of the permitted values for food
+    form.removeParameter( "CreditCard" );         // clear the check box
+    form.submit();                                // submit the form
+</PRE>
+And of course the test could then proceed to examine the response to this submission as well,
+obtaining it from <code>wc.getCurrentPage()</code>.
+
+<H2>Working with frames</H2>
+<P>Without frames, web interaction tends to be straightforward and sequential. There is one current active page at a time,
+and each new page replaces the old one that referenced it. Frames change that, allowing multiple active pages simultaneously,
+and allowing for the possibility that a link from one active page could result in the replacement of a different page.</P>
+
+<P>HttpUnit supports frames by providing methods on the WebConversation class to examine those frames
+which are currently active.  Each response replaces the contents of the appropriate frame, which is not necessarily
+the topmost frame ("_top").  In the following scenation, there are two active subframes, named "overview" and "details":
+
+<PRE>
+    WebConversation wc = <b>new</b> WebConversation();
+    WebResponse top     = wc.getResponse( "http://www.meterware.com/Frames.html" ); // read a page with two frames
+    WebResponse summary = wc.getFrameContents( "summary" );                         // read the summary frame
+    WebLink     link    = summary.getLinkWith( "Cake Recipe" );                     // find the link (which targets "details" );
+    link.click();                                                                   // click on it
+    WebResponse response= wc.getFrameContents( "details" );                         // retrieve the details frame
+</PRE>
+
+
+</BODY>
+</HTML>
+
+
+

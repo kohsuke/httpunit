@@ -1,0 +1,13 @@
+build
+*.ipr
+*.iml
+*.iws
+savejars
+dist
+lib
+bin
+web
+.project
+.classpath
+*.zip
+.svn

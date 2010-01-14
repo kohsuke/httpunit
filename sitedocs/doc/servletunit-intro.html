@@ -1,0 +1,138 @@
+<HTML>
+
+<HEAD>
+    <TITLE>ServletUnit Overview</TITLE>
+</HEAD>
+
+<BODY>
+<P>As a testing tool, HttpUnit is primarily designed for "black-box" testing of web sites.
+In many cases that may be all you need; however, if you are developing complex servlets,
+you may wish to test smaller pieces of your code. Sometimes you can isolate them into simple
+tests using only JUnit. In other cases, you will want to test in a servlet environment. At this
+point you have two basic approaches available. You can test in a real servlet container, using
+a tool such as <A HREF="http://jakarta.apache.org/cactus/">Apache Cactus</A>, which has you
+deploy your tests into the container along with your servlets. Or you can use a simulated servlet
+container. ServletUnit takes the latter approach.</P>
+
+<h2>Getting Started with ServletUnit</h2>
+<P>To test a servlet in ServletUnit, you first instantiate a <CODE>ServletRunner</CODE>
+(the simulated container), and register your servlets:
+<PRE>
+    ServletRunner sr = <b>new</b> ServletRunner();
+    sr.registerServlet( "myServlet", StatefulServlet.<b>class</b>.getName() );
+</PRE>
+Note that for complex tests, you can register multiple servlets in a single <CODE>ServletRunner</CODE> or initialize
+the <code>ServletRunner</code> with the name of a web.xml file from which to read an entire application full of servlets.
+
+You are now ready to begin. You need a <CODE>ServletUnitClient</CODE>, which performs much the
+same function as HttpUnit's <CODE>WebConversation</CODE> - in fact, they both extend the base
+class <CODE>WebClient</CODE>, so you can use it the same way, except of course that <CODE>ServletUnitClient</CODE>
+ignores the host portion of URLs in requests passed to it and goes directly to its <CODE>ServletRunner</CODE>.
+
+This means that you can invoke the servlet and handle its response in the same way you have
+been accustomed to in HttpUnit:
+<PRE>
+    ServletUnitClient sc = sr.newClient();
+    WebRequest request   = <b>new</b> PostMethodWebRequest( "http://test.meterware.com/myServlet" );
+    request.setParameter( "color", "red" );
+    WebResponse response = sc.getResponse( request );
+    assertNotNull( "No response received", response );
+    assertEquals( "content type", "text/plain", response.getContentType() );
+    assertEquals( "requested resource", "You selected red", response.getText() );
+</PRE>
+
+<h2>Testing Servlet Internals</h2>
+
+The above approach is still black-box testing. To really take advantage of the power of ServletUnit,
+you can handle your request in steps. To do this, instead of asking the client for the final response,
+you ask it for an invocation context:
+<PRE>
+    ServletUnitClient sc = sr.newClient();
+    WebRequest request   = <b>new</b> PostMethodWebRequest( "http://test.meterware.com/myServlet" );
+    request.setParameter( "color", "red" );
+    InvocationContext ic = sc.newInvocation( request );
+</PRE>
+
+This invocation context provides access to the selected servlet, which has been initialized for you
+with the appropriate session information, as well as the request and response objects which the
+servlet will process. Now you can call methods on the servlet, on the servlet session, or on
+the request and response objects.  For example, given the following servlet definition:
+<PRE>
+    <b>public class</b> StatefulServlet <b>extends</b> HttpServlet {
+
+        <b>protected void</b> doPost( HttpServletRequest req, HttpServletResponse resp ) <b>throws</b> ServletException,IOException {
+            resp.setContentType( "text/plain" );
+            writeSelectMessage( req.getParameter( "color" ), resp.getWriter() );
+            setColor( req, req.getParameter( "color" ) );
+        }
+
+        <b>void</b> writeSelectMessage( String color, PrintWriter pw ) <b>throws</b> IOException {
+            pw.print( "You selected " + color );
+            pw.close();
+        }
+
+        <b>void</b> setColor( HttpServletRequest req, String color ) <b>throws</b> ServletException {
+            req.getSession().setAttribute( "color", color );
+        }
+    }
+</PRE>
+you might want to test the individual methods one at a time. The following code obtains the servlet and
+casts it to get access to its package-level methods (the tests should be in the same package as
+the servlet to do this). It then invokes the setColor method to ensure that it is creating and
+updating the session correctly.
+<PRE>
+    StatefulServlet ss = (StatefulServlet) ic.getServlet();
+    assertNull( "A session already exists", ic.getRequest().getSession( <b>false</b> ) );
+
+    ss.setColor( ic.getRequest(), "blue" );
+    assertNotNull( "Session was not created", ic.getRequest().getSession( <b>false</b> ) );
+    assertEquals( "Color in session", "blue", ic.getRequest().getSession().getAttribute( "color" ) );
+</PRE>
+
+You can test the response from the servlet as well, if you invoke the code which creates it:
+<PRE>
+    StatefulServlet ss = (StatefulServlet) ic.getServlet();
+    ic.getResponse().setContentType( "text/plain" );
+    ss.writeSelectMessage( "blue", ic.getResponse().getWriter() );
+
+    WebResponse response = ic.getServletResponse();
+    assertEquals( "requested resource", "You selected blue", response.getText() );
+    assertEquals( "Returned cookie count", 1, response.getNewCookieNames().length );
+</PRE>
+Note first that you must do all of the processing that the <code>service</code> method would have done if you take this
+approach. You may either call the <code>service</code> method itself, or a combination of other calls that will prepare
+the response in the fashion you wish to test. Not also that the response returned from <CODE>getServletResponse</CODE>
+is the actual one returned by the servlet, without any processing by the client. For example, if the request contains a
+bad status or a forward request, the client might do some additional processing, which is not done at this time.
+Of course, since the response extends <CODE>WebResponse</CODE>, all of the normal HTML parsing methods
+are available to examine it.
+
+<h2>Maintaining State Across Multiple Responses</h2>
+
+If you are using <code>InvocationContext</code> to access servlet internals, you are usually not completing the request cycle;
+as a result, the client will not process any cookies and state will not be maintained across requests. In many cases, this
+is OK. But if you are writing a test which depends on the maintenance of state across servlet
+invocations, you will want to reinvolve the <CODE>ServletUnitClient</CODE>, giving it a chance
+to process the response, including updating its own list of cookies:
+<PRE>
+    WebResponse response sc.getResponse( ic );   // pass the already processed InvocationContext
+
+    response = sc.getResponse( "http://test.meterware.com/ReadColorFromSession" );
+    assertNotNull( "No response received", response );
+    assertEquals( "content type", "text/plain", response.getContentType() );
+    assertEquals( "requested resource", "You posted blue", response.getText() );
+    assertEquals( "Returned cookie count", 0, response.getNewCookieNames().length );
+</PRE>
+This allows any subsequent request through the same client object to take advantage of the
+session state established by the just completed request, just as is possible with HttpUnit.
+
+<h2>Testing Security</h2>
+If you are using a web.xml file to define your servlets, you can also test protected resources. ServletUnit supports
+both Basic and Form authentication, and handles them just as HttpUnit does. For Basic authentication, you must call
+setAuthorization passing a username and password, while Form authentication is handled just like any other form. Since
+ServletUnit does not maintain a database of users, it will accept any user/password combination as valid, and treat the
+password as a comma-separated list of role names.
+</BODY>
+</HTML>
+
+

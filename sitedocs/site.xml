@@ -1,0 +1,56 @@
+<?xml version='1.0' ?>
+<site project="HttpUnit" group-id="6550" logo="doc/images/HttpUnit.jpg">
+    <copyright owner="Russell Gold" dates="2000-2008"/>
+
+    <page location="index.html" title="Home" mainPage="true">
+        <fragment source="sitedocs/welcome.html"/>
+        <fragment source="sitedocs/news.xml" />
+    </page>
+
+    <page location="doc/license.html" title="License" license="true">
+        <fragment source="sitedocs/doc/license.html"/>
+    </page>
+
+    <external location="http://prdownloads.sourceforge.net/httpunit/httpunit-1.7.zip?download" item="Download 1.7"/>
+
+    <space/>
+    <page location="doc/cookbook.html" title="Cookbook">
+        <fragment source="sitedocs/doc/cookbook.html"/>
+    </page>
+
+    <page location="doc/tutorial/index.html" title="Tutorial">
+        <fragment source="sitedocs/tutorial.html"/>
+    </page>
+
+<!--    <external location="doc/manual/index.html" item="User Manual"/>  -->
+    <external location="doc/api/index.html" item="JavaDoc"/>
+
+    <page location="doc/faq.html" item="FAQ" title="Frequently Asked Questions">
+        <fragment source="sitedocs/doc/faq.xml"/>
+    </page>
+
+    <page location="doc/citations.html" title="Citations on the Web" item="External Citations">
+        <fragment source="sitedocs/doc/citations.xml" />
+    </page>
+
+    <page location="doc/javascript-support.html" item="JavaScript Support" title="JavaScript DOM Elements Supported">
+        <fragment source="sitedocs/doc/javascript-support.html" />
+    </page>
+
+    <page location="doc/servletunit-intro.html" item="ServletUnit Intro" title="ServletUnit Overview">
+        <fragment source="sitedocs/doc/servletunit-intro.html" />
+    </page>
+
+    <space/>
+    <page location="doc/developers.html" title="Developers">
+        <fragment source="sitedocs/doc/developers.xml" />
+    </page>
+
+    <project-page type="svn" item="Subversion Repository"/>
+    <external location="http://lists.sourceforge.net/lists/listinfo/httpunit-develop" item="Mailing List"/>
+    <space/>
+    <project-page type="bugs" item="Bug Database" />
+    <project-page type="enhancements" item="Feature Requests" />
+    <space/>
+    <project-page type="donations" item="Support HttpUnit"/>
+</site>
