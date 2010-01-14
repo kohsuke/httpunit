@@ -17,7 +17,7 @@ export MAVEN_OPTS=-Xmx384M
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.kohsuke.httpunit</groupId>
 	<artifactId>httpunit</artifactId>
-	<version>1.7-patch-1</version>
+	<version>1.7-patch-2-SNAPSHOT</version>
 	<description>A library for testing websites programmatically</description>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
