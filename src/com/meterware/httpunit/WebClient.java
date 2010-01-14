@@ -28,10 +28,15 @@ import java.net.PasswordAuthentication;
 
 import java.util.*;
 
+import com.meterware.httpunit.dom.DocumentBuilderFactoryFilter;
 import org.xml.sax.SAXException;
 
 import com.meterware.httpunit.cookies.Cookie;
 import com.meterware.httpunit.cookies.CookieJar;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 
 /**
@@ -61,6 +66,7 @@ public class WebClient {
     private String _proxyAuthorizationString;
     private Hashtable _credentials = new Hashtable();
 
+    private DocumentBuilderFactory documentBuilderFactory;
 
     public WebWindow getMainWindow() {
         return _mainWindow;
@@ -415,8 +421,22 @@ public class WebClient {
 
     protected WebClient() {
         _openWindows.add( _mainWindow );
+        documentBuilderFactory = new DocumentBuilderFactoryFilter(DocumentBuilderFactory.newInstance()) {
+            public DocumentBuilder newDocumentBuilder() throws ParserConfigurationException {
+                DocumentBuilder db = super.newDocumentBuilder();
+                db.setEntityResolver( new HttpUnitUtils.ClasspathEntityResolver() );
+                return db;
+            }
+        };
     }
 
+    public DocumentBuilderFactory getDocumentBuilderFactory() {
+        return documentBuilderFactory;
+    }
+
+    public void setDocumentBuilderFactory(DocumentBuilderFactory documentBuilderFactory) {
+        this.documentBuilderFactory = documentBuilderFactory;
+    }
 
     /**
      * Creates a web response object which represents the response to the specified web request.

@@ -88,6 +88,7 @@ export MAVEN_OPTS=-Xmx384M
 						<exclude>**/EventAwareTestCase.class</exclude>
 						<exclude>**/WebClientTest.class</exclude>
 						<exclude>**/WebPageTest.class</exclude>
+                        <exclude>**/Abstract*Test.class</exclude>
 					</excludes>
 				</configuration>
 			</plugin>

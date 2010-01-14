@@ -45,6 +45,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.mozilla.javascript.Scriptable;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 /**
  * A response to a web request from a web server.
  *
@@ -571,8 +573,10 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
             return (Document) getReceivedPage().getDOM();
         } else {
             try {
-                return HttpUnitUtils.parse( new InputSource( new StringReader( getText() ) ) );
+                return _client.getDocumentBuilderFactory().newDocumentBuilder().parse(new InputSource( new StringReader( getText() ) ));
             } catch (IOException e) {
+                throw new SAXException( e );
+            } catch (ParserConfigurationException e) {
                 throw new SAXException( e );
             }
         }
