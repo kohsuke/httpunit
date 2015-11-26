@@ -81,6 +81,17 @@ public class EncodingTest extends HttpUnitTest {
     }
 
 
+    public void testParseEmptyHeader() throws Exception {
+        String invalidHeader = "";
+        try {
+            String result[]=HttpUnitUtils.parseContentTypeHeader(invalidHeader);
+            fail();
+        } catch (IllegalArgumentException iae) {
+            assertEquals( "header", "Attempting to parse invalid header" , iae.getMessage() );
+        }
+    }
+
+
     public void testSpecifiedEncoding() throws Exception {
         String hebrewTitle = "\u05d0\u05d1\u05d2\u05d3";
         String page = "<html><head><title>" + hebrewTitle + "</title></head>\n" +
