@@ -76,6 +76,9 @@ public class HttpUnitUtils {
     public static String[] parseContentTypeHeader( String header ) {
         String[] result = new String[] { "text/plain", null };
         StringTokenizer st = new StringTokenizer( header, ";=" );
+        if (!st.hasMoreTokens()) {
+            throw new IllegalArgumentException( "Attempting to parse invalid header" );
+        }
         result[0] = st.nextToken();
         while (st.hasMoreTokens()) {
             String parameter = st.nextToken();
